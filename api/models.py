@@ -3,7 +3,10 @@ import uuid
 from typing import Optional
 
 from fastapi import HTTPException
-from pydantic import BaseModel, EmailStr, field_validator, constr
+from pydantic import BaseModel
+from pydantic import constr
+from pydantic import EmailStr
+from pydantic import field_validator
 
 LETTER_MATCH_PATTERN = re.compile(r"^[а-яА-Яa-zA-Z\-]+$")
 

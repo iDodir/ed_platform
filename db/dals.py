@@ -1,7 +1,8 @@
 from typing import Optional
 from uuid import UUID
 
-from sqlalchemy import update, select
+from sqlalchemy import select
+from sqlalchemy import update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from db.models import User
