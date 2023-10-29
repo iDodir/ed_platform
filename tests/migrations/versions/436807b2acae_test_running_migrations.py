@@ -1,8 +1,8 @@
 """test running migrations
 
-Revision ID: 2ea7490ea992
+Revision ID: 436807b2acae
 Revises:
-Create Date: 2023-10-28 09:47:21.792715
+Create Date: 2023-10-29 10:06:19.628778
 
 """
 from typing import Sequence
@@ -13,7 +13,7 @@ from alembic import op
 
 
 # revision identifiers, used by Alembic.
-revision: str = "2ea7490ea992"
+revision: str = "436807b2acae"
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -28,6 +28,7 @@ def upgrade() -> None:
         sa.Column("surname", sa.String(), nullable=False),
         sa.Column("email", sa.String(), nullable=False),
         sa.Column("is_active", sa.Boolean(), nullable=True),
+        sa.Column("hashed_password", sa.String(), nullable=False),
         sa.PrimaryKeyConstraint("user_id"),
         sa.UniqueConstraint("email"),
     )

@@ -15,6 +15,7 @@ from api.models import UpdateUserRequest
 from api.models import UserCreate
 from db.dals import UserDAL
 from db.session import get_db
+from hashing import Hasher
 
 logger = getLogger(__name__)
 
@@ -29,6 +30,7 @@ async def _create_new_user(body: UserCreate, db: AsyncSession) -> ShowUser:
                 name=body.name,
                 surname=body.surname,
                 email=body.email,
+                hashed_password=Hasher.get_password_hash(body.password),
             )
             return ShowUser(
                 user_id=user.user_id,
@@ -54,7 +56,8 @@ async def _update_user(updated_user_params: dict, user_id: UUID, db) -> Optional
         async with session.begin():
             user_dal = UserDAL(session)
             updated_user_id = await user_dal.update_user(
-                user_id=user_id, **updated_user_params
+                user_id=user_id,
+                **updated_user_params,
             )
             return updated_user_id
 

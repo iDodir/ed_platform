@@ -8,6 +8,7 @@ async def test_create_user(client, get_user_from_database):
         "name": "dodir",
         "surname": "idodir",
         "email": "dodir@example.com",
+        "password": "SamplePass1!",
     }
     resp = client.post("/user/", data=json.dumps(user_data))
     data_from_resp = resp.json()
@@ -31,11 +32,13 @@ async def test_create_user_duplicate_email_error(client, get_user_from_database)
         "name": "dodir",
         "surname": "idodir",
         "email": "dodir@example.com",
+        "password": "SamplePass1!",
     }
     user_data_same_email = {
         "name": "veter",
         "surname": "iveter",
         "email": "dodir@example.com",
+        "password": "SamplePass1!",
     }
     resp = client.post("/user/", data=json.dumps(user_data))
     data_from_resp = resp.json()
@@ -92,7 +95,14 @@ MSG = "value is not a valid email address: The email address is not valid. It mu
                         "input": {},
                         "url": "https://errors.pydantic.dev/2.4/v/missing",
                     },
-                ],
+                    {
+                        "type": "missing",
+                        "loc": ["body", "password"],
+                        "msg": "Field required",
+                        "input": {},
+                        "url": "https://errors.pydantic.dev/2.4/v/missing",
+                    },
+                ]
             },
         ),
         (
@@ -123,7 +133,14 @@ MSG = "value is not a valid email address: The email address is not valid. It mu
                             "reason": "The email address is not valid. It must have exactly one @-sign."
                         },
                     },
-                ],
+                    {
+                        "type": "missing",
+                        "loc": ["body", "password"],
+                        "msg": "Field required",
+                        "input": {"name": 123, "surname": 456, "email": "lol"},
+                        "url": "https://errors.pydantic.dev/2.4/v/missing",
+                    },
+                ]
             },
         ),
         (
@@ -147,7 +164,14 @@ MSG = "value is not a valid email address: The email address is not valid. It mu
                             "reason": "The email address is not valid. It must have exactly one @-sign."
                         },
                     },
-                ],
+                    {
+                        "type": "missing",
+                        "loc": ["body", "password"],
+                        "msg": "Field required",
+                        "input": {"name": "dodir", "surname": 456, "email": "lol"},
+                        "url": "https://errors.pydantic.dev/2.4/v/missing",
+                    },
+                ]
             },
         ),
         (
@@ -164,7 +188,18 @@ MSG = "value is not a valid email address: The email address is not valid. It mu
                             "reason": "The email address is not valid. It must have exactly one @-sign."
                         },
                     },
-                ],
+                    {
+                        "type": "missing",
+                        "loc": ["body", "password"],
+                        "msg": "Field required",
+                        "input": {
+                            "name": "dodir",
+                            "surname": "idodir",
+                            "email": "dodir",
+                        },
+                        "url": "https://errors.pydantic.dev/2.4/v/missing",
+                    },
+                ]
             },
         ),
     ],
@@ -175,4 +210,13 @@ async def test_create_user_validation_error(
     resp = client.post("/user/", data=json.dumps(user_data_for_creation))
     data_from_resp = resp.json()
     assert resp.status_code == expected_status_code
+
+    print()
+    print("====================================")
+    print()
+    print(data_from_resp)
+    print()
+    print("=================================================")
+    print()
+
     assert data_from_resp == expected_detail
