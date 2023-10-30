@@ -1,5 +1,4 @@
 import asyncio
-import os
 from datetime import timedelta
 from typing import Any
 from typing import Generator
@@ -13,9 +12,12 @@ from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.orm import sessionmaker
 
 import settings
+from db.dals import PortalRole
 from db.session import get_db
 from main import app
 from security import create_access_token
+
+# import os
 
 CLEAN_TABLES = [
     "users",
@@ -33,7 +35,8 @@ def event_loop():
 async def run_migrations():
     # os.system("alembic init -t async migrations")
     # os.system('alembic revision --autogenerate -m "test running migrations"')
-    os.system("alembic upgrade head")
+    # os.system("alembic upgrade head")
+    pass
 
 
 @pytest.fixture(scope="session")
@@ -105,16 +108,18 @@ async def create_user_in_database(asyncpg_pool):
         email: str,
         is_active: bool,
         hashed_password: str,
+        roles: list[PortalRole],
     ):
         async with asyncpg_pool.acquire() as connection:
             return await connection.execute(
-                """INSERT INTO users VALUES ($1, $2, $3, $4, $5, $6)""",
+                """INSERT INTO users VALUES ($1, $2, $3, $4, $5, $6, $7)""",
                 user_id,
                 name,
                 surname,
                 email,
                 is_active,
                 hashed_password,
+                roles,
             )
 
     return create_user_in_database

@@ -3,7 +3,9 @@ from uuid import UUID
 
 from api.models import ShowUser
 from api.models import UserCreate
+from db.dals import PortalRole
 from db.dals import UserDAL
+from db.models import User
 from hashing import Hasher
 
 
@@ -15,6 +17,7 @@ async def _create_new_user(body: UserCreate, session) -> ShowUser:
             surname=body.surname,
             email=body.email,
             hashed_password=Hasher.get_password_hash(body.password),
+            roles=[PortalRole.ROLE_PORTAL_USER],
         )
         return ShowUser(
             user_id=user.user_id,
@@ -48,17 +51,31 @@ async def _update_user(
         return updated_user_id
 
 
-async def _get_user_by_id(user_id, session) -> Optional[ShowUser]:
+async def _get_user_by_id(user_id, session) -> Optional[User]:
     async with session.begin():
         user_dal = UserDAL(session)
         user = await user_dal.get_user_by_id(
             user_id=user_id,
         )
         if user is not None:
-            return ShowUser(
-                user_id=user.user_id,
-                name=user.name,
-                surname=user.surname,
-                email=user.email,
-                is_active=user.is_active,
-            )
+            return user
+
+
+def check_user_permissions(target_user: User, current_user: User) -> bool:
+    if target_user.user_id != current_user.user_id:
+        if not {
+            PortalRole.ROLE_PORTAL_ADMIN,
+            PortalRole.ROLE_PORTAL_SUPERADMIN,
+        }.intersection(current_user.roles):
+            return False
+        if (
+            PortalRole.ROLE_PORTAL_SUPERADMIN in target_user.roles
+            and PortalRole.ROLE_PORTAL_ADMIN in current_user.roles
+        ):
+            return False
+        if (
+            PortalRole.ROLE_PORTAL_ADMIN in target_user.roles
+            and PortalRole.ROLE_PORTAL_ADMIN in current_user.roles
+        ):
+            return False
+    return True

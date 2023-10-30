@@ -1,3 +1,4 @@
+from enum import Enum
 from typing import Optional
 from uuid import UUID
 
@@ -7,6 +8,12 @@ from sqlalchemy import update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from db.models import User
+
+
+class PortalRole(str, Enum):
+    ROLE_PORTAL_USER = "ROLE_PORTAL_USER"
+    ROLE_PORTAL_ADMIN = "ROLE_PORTAL_ADMIN"
+    ROLE_PORTAL_SUPERADMIN = "ROLE_PORTAL_SUPERADMIN"
 
 
 class UserDAL:
@@ -19,12 +26,14 @@ class UserDAL:
         surname: str,
         email: EmailStr,
         hashed_password: str,
+        roles: list[PortalRole],
     ) -> User:
         new_user = User(
             name=name,
             surname=surname,
             email=email,
             hashed_password=hashed_password,
+            roles=roles,
         )
         self.db_session.add(new_user)
         await self.db_session.flush()
