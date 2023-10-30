@@ -1,5 +1,6 @@
 import asyncio
 import os
+from datetime import timedelta
 from typing import Any
 from typing import Generator
 
@@ -14,6 +15,7 @@ from sqlalchemy.orm import sessionmaker
 import settings
 from db.session import get_db
 from main import app
+from security import create_access_token
 
 CLEAN_TABLES = [
     "users",
@@ -116,3 +118,11 @@ async def create_user_in_database(asyncpg_pool):
             )
 
     return create_user_in_database
+
+
+def create_test_auth_headers_for_user(email: str) -> dict[str, str]:
+    access_token = create_access_token(
+        data={"sub": email},
+        expires_delta=timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES),
+    )
+    return {"Authorization": f"Bearer {access_token}"}
