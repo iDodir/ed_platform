@@ -1,9 +1,10 @@
 from uuid import uuid4
 
+from db.models import PortalRole
 from tests.conftest import create_test_auth_headers_for_user
 
 
-async def test_get_user(client, create_user_in_database, get_user_from_database):
+async def test_get_user(client, create_user_in_database):
     user_data = {
         "user_id": uuid4(),
         "name": "dodir",
@@ -11,7 +12,7 @@ async def test_get_user(client, create_user_in_database, get_user_from_database)
         "email": "dodir@example.com",
         "is_active": True,
         "hashed_password": "SampleHashedPass",
-        "roles": ["ROLE_PORTAL_USER"],
+        "roles": [PortalRole.ROLE_PORTAL_USER],
     }
     await create_user_in_database(**user_data)
     resp = client.get(
@@ -30,7 +31,6 @@ async def test_get_user(client, create_user_in_database, get_user_from_database)
 async def test_get_user_id_validation_error(
     client,
     create_user_in_database,
-    get_user_from_database,
 ):
     user_data = {
         "user_id": uuid4(),
@@ -39,7 +39,7 @@ async def test_get_user_id_validation_error(
         "email": "dodir@example.com",
         "is_active": True,
         "hashed_password": "SampleHashedPass",
-        "roles": ["ROLE_PORTAL_USER"],
+        "roles": [PortalRole.ROLE_PORTAL_USER],
     }
     await create_user_in_database(**user_data)
     resp = client.get(
@@ -67,7 +67,6 @@ async def test_get_user_id_validation_error(
 async def test_get_user_not_found(
     client,
     create_user_in_database,
-    get_user_from_database,
 ):
     user_data = {
         "user_id": uuid4(),
@@ -76,7 +75,7 @@ async def test_get_user_not_found(
         "email": "dodir@example.com",
         "is_active": True,
         "hashed_password": "SampleHashedPass",
-        "roles": ["ROLE_PORTAL_USER"],
+        "roles": [PortalRole.ROLE_PORTAL_USER],
     }
     user_id_for_finding = uuid4()
     await create_user_in_database(**user_data)
@@ -91,7 +90,6 @@ async def test_get_user_not_found(
 async def test_get_user_unauth_error(
     client,
     create_user_in_database,
-    get_user_from_database,
 ):
     user_data = {
         "user_id": uuid4(),
@@ -100,7 +98,7 @@ async def test_get_user_unauth_error(
         "email": "dodir@example.com",
         "is_active": True,
         "hashed_password": "SampleHashedPass",
-        "roles": ["ROLE_PORTAL_USER"],
+        "roles": [PortalRole.ROLE_PORTAL_USER],
     }
     user_id_for_finding = uuid4()
     await create_user_in_database(**user_data)
@@ -119,7 +117,7 @@ async def test_get_user_bad_cred(client, create_user_in_database):
         "email": "dodir@example.com",
         "is_active": True,
         "hashed_password": "SampleHashedPass",
-        "roles": ["ROLE_PORTAL_USER"],
+        "roles": [PortalRole.ROLE_PORTAL_USER],
     }
     await create_user_in_database(**user_data)
     user_id = uuid4()
@@ -139,7 +137,7 @@ async def test_get_user_unauth(client, create_user_in_database):
         "email": "dodir@example.com",
         "is_active": True,
         "hashed_password": "SampleHashedPass",
-        "roles": ["ROLE_PORTAL_USER"],
+        "roles": [PortalRole.ROLE_PORTAL_USER],
     }
     await create_user_in_database(**user_data)
     user_id = uuid4()

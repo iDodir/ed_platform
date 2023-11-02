@@ -12,7 +12,7 @@ from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.orm import sessionmaker
 
 import settings
-from db.dals import PortalRole
+from db.models import PortalRole
 from db.session import get_db
 from main import app
 from security import create_access_token
