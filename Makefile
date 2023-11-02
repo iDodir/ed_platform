@@ -6,3 +6,6 @@ down:
 
 migrate:
 	alembic upgrade head
+
+run:
+	docker-compose -f docker-compose-ci.yaml up -d

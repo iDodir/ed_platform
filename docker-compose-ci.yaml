@@ -1,0 +1,31 @@
+version: "3.0"
+services:
+  edu_db:
+    container_name: "edu_db"
+    image: postgres:14.1-alpine
+#    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+    ports:
+      - "5432:5432"
+    networks:
+      - custom
+
+  edu_app:
+    container_name: edu_app
+    image: edu_app
+    environment:
+      REAL_DATABASE_URL: "postgresql+asyncpg://postgres:postgres@edu_db:5432/postgres"
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    networks:
+      - custom
+
+networks:
+  custom:
+    driver: bridge
