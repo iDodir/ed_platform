@@ -1,0 +1,91 @@
+version: "3.0"
+services:
+  db:
+    container_name: "db"
+    image: postgres:14.1-alpine
+#    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=edu_db
+    ports:
+      - "5433:5432"
+    networks:
+      - custom
+
+  db_test:
+    container_name: "db_test"
+    image: postgres:14.1-alpine
+#    restart: always
+    environment:
+      - POSTGRES_USER=postgres_test
+      - POSTGRES_PASSWORD=postgres_test
+      - POSTGRES_DB=edu_db_test
+    ports:
+      - "5434:5432"
+    networks:
+      - custom
+
+  redis:
+    image: redis
+    networks:
+      - custom
+
+  postgres:
+    image: postgres
+    environment:
+      POSTGRES_USER: sentry
+      POSTGRES_PASSWORD: sentry
+      POSTGRES_DB: sentry
+    networks:
+      - custom
+
+  sentry:
+    image: sentry
+    links:
+      - redis
+      - postgres
+    ports:
+      - "9000:9000"
+    environment:
+      SENTRY_SECRET_KEY: '!!!SECRET!!!'
+      SENTRY_POSTGRES_HOST: postgres
+      SENTRY_DB_USER: sentry
+      SENTRY_DB_PASSWORD: sentry
+      SENTRY_REDIS_HOST: redis
+    networks:
+      - custom
+
+  cron:
+    image: sentry
+    links:
+      - redis
+      - postgres
+    command: "sentry run cron"
+    environment:
+      SENTRY_SECRET_KEY: '!!!SECRET!!!'
+      SENTRY_POSTGRES_HOST: postgres
+      SENTRY_DB_USER: sentry
+      SENTRY_DB_PASSWORD: sentry
+      SENTRY_REDIS_HOST: redis
+    networks:
+      - custom
+
+  worker:
+    image: sentry
+    links:
+      - redis
+      - postgres
+    command: "sentry run worker"
+    environment:
+      SENTRY_SECRET_KEY: '!!!SECRET!!!'
+      SENTRY_POSTGRES_HOST: postgres
+      SENTRY_DB_USER: sentry
+      SENTRY_DB_PASSWORD: sentry
+      SENTRY_REDIS_HOST: redis
+    networks:
+      - custom
+
+networks:
+  custom:
+    driver: bridge
