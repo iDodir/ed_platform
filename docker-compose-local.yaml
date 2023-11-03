@@ -26,6 +26,32 @@ services:
     networks:
       - custom
 
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+#    restart: unless-stopped
+    volumes:
+      - ./prometheus.yaml:/etc/prometheus/prometheus.yaml
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yaml'
+    ports:
+      - "9090:9090"
+    networks:
+      - custom
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./grafana_storage:/var/lib/grafana
+    depends_on:
+      - prometheus
+#    restart: always
+    networks:
+      - custom
+    user: "0"
+
 networks:
   custom:
     driver: bridge
